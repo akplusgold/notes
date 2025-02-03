@@ -1,0 +1,93 @@
+[Installing packages]
+
+# Install packages from source via ports
+  pkg_add i3-gaps i3lock i3status
+
+# Enable & start xenodm
+  rcctl enable <service name> && rcctl start <service name>
+
+
+[PACKAGE MANAGEMENT]
+* Documentation: https://www.openbsd.org/faq/ports/ports.html
+
+# Searching for package
+  cd /usr/ports
+  make search key=[package name]
+
+# Searching for different versions offered for the same package
+  cd /usr/ports/[package]/[sub-package]
+  make show=FLAVORS
+
+# Installing with a particular flavor
+  cd /etc/ports/[package]/[sub-package]
+  env FLAVOR="[insert_flavor]" make install 
+
+# Showing sub packages
+  make show=MULTI_PACKAGES
+
+# To list the different packages built by a port, 
+  make show=PKGNAMES
+
+# Installing sub package
+  env SUBPACKAGE="-name" make install
+
+# Cleaning after install 
+  make clean (only cleans built package)
+  make clean=depends ( does(1) + also cleans depends)
+  make package BULK=Yes (to automatically cleanup after install)
+
+# Removing package
+  cd /usr/ports/[package]/[sub-package]
+  make uninstall 
+
+# Embedded devices without hardware clock
+  * Usually ntpd should be enabled using rcctl since most embedded do not have a hardware clock.
+
+    If the time is inaccurate, you can:
+        > Set the correct location first:
+           'ln -s /usr/share/zoneinfo/Asia/[Country] /etc/localtime'
+        > Sync network time:  
+	   'ntpd -vs' / 'rdate -v pool.ntp.org'
+
+
+[Networking tools]
+# Viewing network information:
+    1) netstat -rn
+    2) route show
+
+# Network config file:
+    > /etc/hostname.[interface]
+        [sample config]
+            dhcp
+            inet 10.0.0.6 255.255.255.0
+
+    > Use 'sh /etc/netstart' to restart networking reflecting changes in config
+
+
+[DISK Management]
+
+# List disk information:
+sysclt hw.disknames      
+
+
+[System Information]
+# Dump all system configurations
+sysctl 
+
+[Services]
+
+# List services that have been enabled at startup
+cat /etc/rc.conf | grep -E -v '^#' | grep -E 'NO$' | less  
+rcctl ls [started|on] | less
+
+# Display default values for a service
+rcctl get <service name>
+
+
+[Updating System]
+
+# Display patches that are available
+syspatch -c
+
+# Automatically install patches
+syspatch
