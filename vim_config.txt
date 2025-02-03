@@ -1,0 +1,82 @@
+" Setting tab width to 4
+set tabstop=4 softtabstop=4 expandtab shiftwidth=4 smarttab
+
+" Makes sure we always have block cursor, even in insert mode
+"set guicursor=yes
+
+" Turning on Line numbers, relative number changes line numbers according to cusrsor position
+set number 
+set relativenumber
+
+" Faster swapping / opening of buffer
+set hidden
+
+" Show partly types search command
+set incsearch
+
+" Moves display when it gets closer to bottom of screen
+set scrolloff=21
+
+" This wraps our text after 80 characters
+set textwidth=80
+
+" This wraps single lines that extend too far
+set wrap
+set smartindent
+
+
+" This shows > character in single lines that 
+" are wrapped on next lines for easier viewing but 
+" are not multiple lines and this makes it easier to
+" distinguish
+set showbreak=>\ 
+
+
+""######################### Vundle #############################
+"set nocompatible " be iMproved, required
+"filetype off     " required
+"" set the runtime path to include Vundle and initialize
+"set rtp+=~/.vim/bundle/Vundle.vim
+"call vundle#begin()
+"" let Vundle manage Vundle, required
+"Plugin 'VundleVim/Vundle.vim'
+"
+""################## Custom plugins ################## 
+"Plugin 'tpope/vim-commentary'
+"Plugin 'preservim/nerdtree'  "file manager 
+"
+"call vundle#end()            " required
+"filetype plugin indent on    " required
+""##############################################################
+"
+"
+""#################### Color Scheme ############################
+"colorscheme slate
+"set background=dark
+""##############################################################
+
+
+"#################### Keyboard Mappings #######################
+
+" Neovim bindings for easier navigation
+
+" <C-s> to save file
+inoremap <C-S> <Esc>:update<CR>
+nnoremap <A-S> :update<CR>
+
+noremap <silent> <C-S>:update<CR>
+vnoremap <silent> <C-S> <C-C>:update<CR>
+inoremap <silent> <C-S> <C-O>:update<CR>
+
+" Returns back to insert mode after saving
+inoremap <C-S> <Esc>:update<CR>gi
+
+"##############################################################
+
+" Resizing vertical split size
+":vertical resize +5
+":vertical resize -5
+
+if has('nvim')
+  let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+endif
