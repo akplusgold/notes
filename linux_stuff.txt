@@ -1,0 +1,138 @@
+## Please note that all the commands here are not fully tested, see what works for you
+## The following handbooks can provide more indepth information
+https://wiki.gentoo.org/wiki/Handbook:AMD64    
+https://wiki.archlinux.org/title/Installation_guide
+
+
+##################################################
+# Wireless Connection from Commandline           #
+##################################################
+
+# Connecting to Wireless access pointr. Ctrl+A+C navigates to new screen session. Ctrl+A+A navigates back to previous window
+screen && wpa_supplicant -Dnl80211 -i [interface] -c "$(wpa_passphrase 'SSID NAME' 'PASSPHRASE')";
+
+# If wifi access point has some captive portal use elinks / links / lynx (commandline browser) to enter credentials
+elinks http://192.168.1.1
+
+
+##################################################
+# Cloning Hard Disk:                             #
+##################################################
+
+# Cloning 
+1) dd if=/dev/sdx conv=sync,noerror bs=64K| gzip -c > gentoo.img.gz
+
+# Creating hash file of image
+2) md5sum gentoo.img.gz > hash.txt
+
+# Storing hard disk info
+3) fdisk -l /dev/sdx > hdisk.info
+
+# Restoring & verifying hash
+1) md5sum -c hash.txt 
+
+# Restoring backed up image
+2) gunzip -c gentoo.img.gz | dd of=/dev/sdx
+
+
+## Checking performance of ssd/hdd
+hdparm -t --direct /dev/nvme0n1p2
+
+
+##################################################
+# Veracrypt                                      #
+##################################################
+
+# Mounting from commandline
+1) veracrypt -t -k "" /dev/sdx /media/veracrypt1
+
+# Dismounting
+2) veracrypt -d
+
+
+##################################################
+# Partitioning Drives                            #
+##################################################
+fdisk /dev/sdx
+o (create new gpt partition)
+n (p,1,2048, +512M)
+n (p,2,default, default)
+n (2,8E(luks))
+
+## There's also commandline cfdisk utility which is easier
+
+##################################################
+# Luks Encryption                                #
+##################################################
+1) cryptsetup luksFormat -v -c aes-xts-plain64 -i 10000  -s 512 -y -h sha512 /dev/sdx2
+
+## Plain luks 
+2) cryptsetup open /dev/sdx2 root
+
+3) mkfs.ext4 /dev/mapper/root 
+
+
+##################################################
+# Mounting Partitions				 #
+##################################################
+#
+1) mount /dev/mapper/root /mnt/gentoo
+2) mkdir /mnt/gentoo/boot
+3) mount /dev/sdx1 /mnt/gentoo/boot/
+
+
+##################################################
+# Chrooting                                      #
+##################################################
+## This is geared for gentoo, maybe different based on your distribution
+mount -t proc proc /mnt/gentoo/proc
+mount --rbind /dev /mnt/gentoo/dev
+mount --make-rslave /mnt/gentoo/dev
+mount --rbind /sys /mnt/gentoo/sys
+mount --make-rslave /mnt/gentoo/sys
+chroot /mnt/gentoo /bin/bash
+source /etc/profile
+export PS1="(chroot) $PS1"
+
+
+# Automated kernel compilation (gentoo)
+1) genkernel --menuconfig --save-config --luks --iscsi --lvm --install all
+
+##################################################
+# Installing Bootloader                          #
+##################################################
+1) Edit /etc/default/grub and insert the following values
+## enable_rc6, enable_fbc = reduce display power consumption; wifi powersaving (ath9k.ps_enable=1 @atheros cards); 
+##      net.ifnames=0 set network interface to traditional naming style (wlan0 instead of wlp0s20f3)
+GRUB_CMDLINE_LINUX="crypt_root=/dev/sda1 real_root=/dev/mapper/root i915.enable_rc6=7 i915.enable_fbc=1 ipv6.disable=1 ath9k.ps_enable=1 net.ifnames=0"
+GRUB_PRELOAD_MODULES="lvm part_msdos"
+GRUB_ENABLE_CRYPTODISK=y
+GRUB_DEVICE=/dev/ram0
+GRUB_DISTRIBUTOR="Gentoo"
+
+# --removable flag important if boot partition inside a USB
+2) grub2-install --modules="linux crypto search-fs_uuid luks lvm" --recheck --boot-directory=/boot --removable /dev/sdx
+3) grub2-mkconfig -o /boot/grub/grub.cfg'
+
+# Unmounting Partitions
+1) umount -R /mnt/gentoo
+
+
+##################################################
+# Timezone                                       #
+##################################################
+
+## Standard systemd (manually set)
+timedatectl set-time '2025-02-01 10:00:00'
+
+## Standard systemd (ntp automatic time synchronization)
+timedatectl set-timezone '[Asia/City]'
+timedatectl set-ntp true && sleep 5 && timedatectl set-ntp false
+
+
+
+##################################################
+# Kernel Hacking                                 #
+##################################################
+1) make localmodconfig  - Update current config disabling modules not loaded
+2) make localyesconfig  - Update current config converting local mods to core
