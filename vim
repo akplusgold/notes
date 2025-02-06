@@ -56,14 +56,15 @@ Miscellaneous:
 - Vim help completion ":h <partialcommand><tab>"
 
 - Generating tags (install ctags): 
-        1) Add code root dir path to vimrc:
-            e.g: set tags +="$HOME/Coding/Python/Password_Manager/"
-        2) ctags -R *
+
+        1) Edit .vimrc and add project path for auto completion:
+            set tags +="$HOME/Coding/Project/"
+
+        2) Run Shell cmd, need to be in project folder (cd $HOME/Coding/Project): 
+	    ctags -R [*.py | *.c]
+
+	##  'C-n / C-p' Jumps to next / previous defition
+
 
 - mksession <session name.vim>
     Saves current vim setup as a sesion file which can be loaded with 'vim -S <session name.vim>' 
-
-Ctags utility can be used to generate tags for source files allowing navigation to and for definition
-    e.g: ctags *.c
-        - 'C-[' Jumps to definition of the function/class under the cursor
-        - 'C-t' Jumps back to the previous location
