@@ -1,0 +1,16 @@
+## Python compilation oneliner
+wget -c 'https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz' && tar -xzf Python-3.9.21.tgz && cd Python-3.9.21/ && ./configure && make && sudo make install
+
+## Wifi connection oneliner
+pkill wpa_supplicant; pkill dhcpcd; wpa_passphrase "wifi name" "passphrase" > /etc/wpa_supplicant.conf; wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant.conf && dhcpcd -4n wlan0;
+echo 'nameserver 1.1.1.1' > /etc/resolv.conf && ping -c4 1.1.1.1
+
+## Flashing ISO using Python (dd tool, which is binary, could be backdoored)
+## Run 'sudo /usr/bin/python3' to get into interactive mode
+f = open('linux_image.iso', 'rb')
+data = f.read()
+device = open('/dev/sda', 'wb')
+device.write(data)
+device.close()
+f.close()
+
