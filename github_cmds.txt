@@ -1,0 +1,19 @@
+### Configuring account for code push via ssh
++ `ssh-keygen -t rsa`
++ `ssh -T git@github.com`
++ `git config --global user.name <username>`
++ `git remote set-url origin "git@github.com:<username>/repo.git"`
+
+
+## Git commands for different functions
+
++ History of all commits:   	      `git log`
++ Revert to latest commit:  	      `git reset --hard HEAD`
++ Changing to a different version:    `git checkout <commit id>`
+</br>
++ Adding changes to local repository: `git add <filename>`
++ Making commit permanent: 	      `git commit -m <comment>`
++ Pushing code via ssh:    	      `git push`
+
+
+
